@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import Header from '../components/Header';
+import ClientHeader from '../components/ClientHeader';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -10,15 +10,16 @@ export const metadata: Metadata = {
   description: 'AI that will make your skin like new',
 };
 
-export default function RootLayout({
-  children,
-}: {
+interface RootLayoutProps {
   children: React.ReactNode;
-}) {
+  section?: string;
+}
+
+export default function RootLayout({ children, section }: RootLayoutProps) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Header />
+        <ClientHeader section={section} />
         <main>{children}</main>
       </body>
     </html>
