@@ -13,14 +13,20 @@ const Header: React.FC<HeaderProps> = ({ section }) => {
   const [currentSection, setCurrentSection] = useState<string | null>(null);
 
   useEffect(() => {
-    if (pathname === '/') {
-      setCurrentSection('INTRO');
-    } else if (section) {
-      setCurrentSection(section.toUpperCase());
-    } else {
-      setCurrentSection(null);
-    }
-  }, [pathname, section]);
+  if (pathname === '/') {
+    setCurrentSection('INTRO');
+  } else if (pathname === '/testing') {
+    setCurrentSection('INTRO');
+  } else if (pathname === '/analysis') {
+    setCurrentSection('ANALYSIS');
+  }
+  
+  else if (section) {
+    setCurrentSection(section.toUpperCase());
+  } else {
+    setCurrentSection(null);
+  }
+}, [pathname, section]);
 
   return (
     <div className="flex flex-row h-[64px] w-full justify-between py-3 mb-3 relative z-[1000]">
