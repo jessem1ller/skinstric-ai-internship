@@ -30,6 +30,33 @@
   --font-mono: var(--font-geist-mono);
 }
 
+@theme {
+  --animate-spin-slowest: spin 55s linear infinite;
+}
+
+@theme {
+  --animate-spin-slower: spin 53s linear infinite;
+}
+
+@theme {
+  --animate-spin-slow: spin 52s linear infinite;
+}
+
+@keyframes slideIn {
+  0% {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.6s ease-in normal;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;

@@ -1,139 +1,257 @@
-// app/testing/page.tsx
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Link from 'next/link';
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 const TestingPage = () => {
+  const [stage, setStage] = useState<'name' | 'location'>('name');
   const [name, setName] = useState('');
+  const [location, setLocation] = useState('');
+  const [nameError, setNameError] = useState('');
+  const [locationError, setLocationError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionSuccess, setSubmissionSuccess] = useState(false);
+  const router = useRouter();
+  const locationInputRef = useRef<HTMLInputElement>(null);
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setName(event.target.value);
-    // We'll add logic for the second input later
+  const validateInput = (value: string): string => {
+    if (typeof value !== 'string' || value.trim() === '') {
+      return 'Please enter a valid text.';
+    }
+    if (/\d/.test(value)) {
+      return 'Input should not contain numbers.';
+    }
+    if (/[^a-zA-Z\s'-]/.test(value)) {
+      return 'Input contains invalid characters.';
+    }
+    return '';
   };
 
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target;
+    if (stage === 'name') {
+      setName(value);
+      setNameError('');
+      setSubmissionSuccess(false);
+    } else if (stage === 'location') {
+      setLocation(value);
+      setLocationError('');
+      setSubmissionSuccess(false);
+    }
+  };
+
+  const submitData = async () => {
+    if (stage === 'name') {
+      const error = validateInput(name);
+      if (error) {
+        setNameError(error);
+        return;
+      }
+      setStage('location');
+    } else if (stage === 'location') {
+      const error = validateInput(location);
+      if (error) {
+        setLocationError(error);
+        return;
+      }
+      setIsSubmitting(true);
+      try {
+        const response = await axios.post(
+          'https://us-central1-api-skinstric-ai.cloudfunctions.net/skinstricPhaseOne',
+          { name, location }
+        );
+        console.log('API Response:', response.data);
+        const responseData = response.data as { success?: boolean; message?: string };
+
+        if (responseData?.success === true) {
+          setSubmissionSuccess(true);
+        } else {
+          alert('Submission failed. Please try again.');
+        }
+      } catch (error: unknown) {
+        console.error('API Error:', error);
+        alert('An error occurred during submission.');
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
+  };
+
+  const handleProceed = () => {
+    if (submissionSuccess) {
+      router.push('/result');
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      if (stage === 'name') {
+        const error = validateInput(name);
+        if (!error) {
+          setStage('location');
+          setTimeout(() => {
+            if (locationInputRef.current) {
+              locationInputRef.current.focus();
+            }
+          }, 0);
+        }
+      } else if (stage === 'location') {
+        submitData();
+      }
+    }
+  };
+//   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+//     if (e.key === 'Enter') {
+//       if (stage === 'name') {
+//         const error = validateInput(name);
+//         if (!error) {
+//           setStage('location');
+//           if (locationInputRef.current) {
+//           locationInputRef.current.focus();
+//         }
+//         }
+//       } else if (stage === 'location') {
+//         submitData();
+//       }
+//     }
+//   };
+
+  const currentPlaceholder = stage === 'name' ? 'Introduce Yourself' : 'Your City Name';
+  const inputValue = stage === 'name' ? name : location;
+  const errorMessage = stage === 'name' ? nameError : locationError;
+
   return (
+    <>
     <div className="min-h-[90vh] flex flex-col items-center justify-center bg-white text-center">
       <div className="absolute top-16 left-9 text-left">
         <p className="font-semibold text-xs">TO START ANALYSIS</p>
       </div>
       <div className="relative flex flex-col items-center justify-center mb-40 w-full h-full">
         <p className="text-sm text-gray-400 tracking-wider uppercase mb-1">CLICK TO TYPE</p>
-        <form className="relative z-10" onSubmit={(e) => e.preventDefault()}>
+        {!submissionSuccess ? (
+          isSubmitting ? (
+            <div className="flex flex-col items-center">
+              <div className="flex items-center">
+                Processing Submission
+                <div className="inline-flex ml-2">
+                  <div className="w-2 h-2 rounded-full bg-[#1A1B1C] animate-bounce [animation-delay:.1s]"></div>
+                  <div className="w-2 h-2 rounded-full bg-[#1A1B1C] animate-bounce"></div>
+                  <div className="w-2 h-2 rounded-full bg-[#1A1B1C] animate-bounce [animation-delay:.3s]"></div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <form className="relative z-10" onSubmit={(e) => e.preventDefault()}>
+              <div className="flex flex-col items-center">
+                {stage === 'name' && (
+                  <input
+                    className={`text-4xl sm:text-5xl font-normal text-center bg-transparent border-b border-black focus:outline-none appearance-none w-[372px] sm:w-[432px] pt-1 tracking-[-0.07em] leading-[64px] text-[#1A1B1C] z-10 ${nameError && 'border-red-500'}`}
+                    placeholder={currentPlaceholder}
+                    type="text"
+                    autoComplete="off"
+                    autoFocus
+                    name={stage}
+                    value={inputValue}
+                    onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
+                  />
+                )}
+                {stage === 'location' && (
+                  <input
+                    className={`text-4xl sm:text-5xl font-normal text-center bg-transparent border-b border-black focus:outline-none appearance-none w-[372px] sm:w-[432px] pt-1 tracking-[-0.07em] leading-[64px] text-[#1A1B1C] z-10 ${locationError && 'border-red-500'}`}
+                    placeholder={currentPlaceholder}
+                    type="text"
+                    autoComplete="off"
+                    name={stage}
+                    value={inputValue}
+                    onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
+                    ref={locationInputRef}
+                  />
+                )}
+                {errorMessage && <p className="text-red-500 text-sm mt-1">{errorMessage}</p>}
+              </div>
+              <button type="submit" className="sr-only">Submit</button>
+            </form>
+          )
+        ) : (
           <div className="flex flex-col items-center">
-            <input
-              className="text-4xl sm:text-5xl font-normal text-center bg-transparent border-b border-black focus:outline-none appearance-none w-[372px] sm:w-[432px] pt-1 tracking-[-0.07em] leading-[64px] text-[#1A1B1C] z-10"
-              placeholder="Introduce Yourself"
-              type="text"
-              autoComplete="off"
-              autoFocus
-              name="name"
-              value={name}
-              onChange={handleInputChange}
-            />
+            <p className="text-3xl font-normal mb-2">THANK YOU!</p>
+            <p className="text-lg">Proceed to the next step</p>
           </div>
-          <button type="submit" className="sr-only">Submit</button>
-        </form>
-        <div className="absolute top-1/2 left-1/2 -translate-x-[50%] -translate-y-1/2 w-[400px] h-[400px] md:w-[600px] md:h-[600px] border-2 border-dotted border-[#A0A4AB] motion-reduce:animate-spin rotate-190"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-[50%] -translate-y-1/2 w-[350px] h-[350px] md:w-[550px] md:h-[550px] border-2 border-dotted border-[#A0A4AB] motion-reduce:animate-spin rotate-185"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-[50%] -translate-y-1/2 w-[300px] h-[300px] md:w-[500px] md:h-[500px] border-2 border-dotted border-[#A0A4AB] animate-spin"></div>
+        )}
+        <div className="absolute top-1/2 left-1/2 -translate-x-[50%] -translate-y-1/2 w-[400px] h-[400px] md:w-[600px] md:h-[600px] border-2 border-dotted border-[#A0A4AB] opacity-50 animate-spin-slow rotate-185"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-[50%] -translate-y-1/2 w-[350px] h-[350px] md:w-[550px] md:h-[550px] border-2 border-dotted border-[#A0A4AB] opacity-30 animate-spin-slower rotate-175"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-[50%] -translate-y-1/2 w-[300px] h-[300px] md:w-[500px] md:h-[500px] border-2 border-dotted border-[#A0A4AB] opacity-60 rotate-160 animate-spin-slowest"></div>
       </div>
       <div className="absolute bottom-38.5 md:bottom-8 w-full flex justify-between md:px-9 px-13">
-        <Link href="/" aria-label="Back">
-          <div>
+        <Link href="/" className="inset-0" aria-label="Back">
+          <div className="flex items-center">
             <div className="relative w-12 h-12 flex items-center justify-center border border-[#1A1B1C] rotate-45 scale-[1] sm:hidden">
-              <span className="rotate-[-45deg] text-xs font-semibold sm:hidden">BACK</span>
+              <span className="rotate-[-45deg] text-xs font-semibold">BACK</span>
             </div>
             <div className="group hidden sm:flex flex-row relative justify-center items-center">
-              <div className="w-12 h-12 hidden sm:flex justify-center border border-[#1A1B1C] rotate-45 scale-[0.85] group-hover:scale-[0.92] ease duration-300"></div>
-              <span className="absolute left-[15px] bottom-[13px] scale-[0.9] rotate-180 hidden sm:block group-hover:scale-[0.92] ease duration-300">▶</span>
-              <span className="text-sm font-semibold hidden sm:block ml-6 ">BACK</span>
+              <div className="w-12 h-12 hidden sm:flex justify-center border border-[#1A1B1C] rotate-45 scale-[0.85] group-hover:scale-[0.92] ease-in-out duration-300"></div>
+              <span className="absolute left-[15px] bottom-[13px] scale-[0.9] rotate-180 hidden sm:block group-hover:scale-[0.92] ease-in-out duration-300">▶</span>
+              <span className="text-sm font-semibold hidden sm:block ml-6">BACK</span>
             </div>
           </div>
         </Link>
+        {!isSubmitting && submissionSuccess && (
+          <button
+            onClick={handleProceed}
+            className="group inset-0 aria-label='Proceed animate-slide-in'"
+          >
+            <div className="relative w-12 h-12 flex items-center justify-center border border-[#1A1B1C] rotate-45 scale-[1] sm:hidden">
+              <span className="rotate-[-45deg] text-xs font-semibold">PROCEED</span>
+            </div>
+            <div className="group hidden sm:flex flex-row relative justify-center items-center">
+              <span className="text-sm font-semibold hidden sm:block ml-6 p-4">PROCEED</span>
+              <div className="w-12 h-12 hidden sm:flex justify-center border border-[#1A1B1C] rotate-45 scale-[0.85] group-hover:scale-[0.92] ease-in-out duration-300"></div>
+              <span className="absolute right-[15px] bottom-[13px] scale-[0.9] rotate-0 hidden sm:block group-hover:scale-[0.92] ease-in-out duration-300">▶</span>
+              
+            </div>
+          </button>
+        )}
       </div>
     </div>
+    </>
   );
 };
 
 export default TestingPage;
 
-// "use client";
-
-// import React, { useState } from 'react';
-// import Link from 'next/link';
-// import Image from 'next/image';
-
-// const TestingPage = () => {
-//   const [name, setName] = useState('');
-
-//   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-//     setName(event.target.value);
-//   };
-
-//   return (
-//     <div className="min-h-[90vh] flex flex-col items-center justify-center bg-white text-center">
-//       <div className="absolute top-16 left-9 text-left">
-//         <p className="font-semibold text-xs">TO START ANALYSIS</p>
-//       </div>
-//       <div className="relative flex flex-col items-center justify-center mb-40 w-full h-full">
-//         <p className="text-sm text-gray-400 tracking-wider uppercase mb-1">CLICK TO TYPE</p>
-//         <form className="relative z-10" onSubmit={(e) => e.preventDefault()}>
-//           <div className="flex flex-col items-center">
-//             <input
-//               className="text-5xl sm:text-6xl font-normal text-center bg-transparent border-b border-black focus:outline-none appearance-none w-[372px] sm:w-[432px] pt-1 tracking-[-0.07em] leading-[64px] text-[#1A1B1C] z-10"
-//               placeholder="Introduce Yourself"
-//               type="text"
-//               autoComplete="off"
-//               autoFocus
-//               name="name"
-//               value={name}
-//               onChange={handleInputChange}
-//             />
-//           </div>
-//           <button type="submit" className="sr-only">Submit</button>
-//         </form>
-//         <Image
-//           alt="Diamond Large"
-//           src="/_next/image?url=%2F_next%2Fstatic%2Fmedia%2FDiamond-light-large.27413569.png&w=1920&q=75"
-//           width={762}
-//           height={762}
-//           className="absolute top-1/2 left-1/2 -translate-x-[50%] -translate-y-1/2 w-[480px] h-[480px] md:w-[762px] md:h-[762px] animate-spin-slow rotate-190"
-//           style={{ color: 'transparent' }}
-//         />
-//         <Image
-//           alt="Diamond Medium"
-//           src="/_next/image?url=%2F_next%2Fstatic%2Fmedia%2FDiamond-medium-medium.7599ea96.png&w=1920&q=75"
-//           width={682}
-//           height={682}
-//           className="absolute top-1/2 left-1/2 -translate-x-[50%] -translate-y-1/2 w-[400px] h-[400px] md:w-[682px] md:h-[682px] animate-spin-slower rotate-185"
-//           style={{ color: 'transparent' }}
-//         />
-//         <Image
-//           alt="Diamond Small"
-//           src="/_next/image?url=%2F_next%2Fstatic%2Fmedia%2FDiamond-dark-small.c887a101.png&w=1920&q=75"
-//           width={602}
-//           height={602}
-//           className="absolute top-1/2 left-1/2 -translate-x-[50%] -translate-y-1/2 w-[320px] h-[320px] md:w-[602px] md:h-[602px] animate-spin-slowest"
-//           style={{ color: 'transparent' }}
-//         />
-//       </div>
-//       <div className="absolute bottom-38.5 md:bottom-8 w-full flex justify-between md:px-9 px-13">
-//         <Link href="/" aria-label="Back">
-//           <div>
-//             <div className="relative w-12 h-12 flex items-center justify-center border border-[#1A1B1C] rotate-45 scale-[1] sm:hidden">
-//               <span className="rotate-[-45deg] text-xs font-semibold sm:hidden">BACK</span>
-//             </div>
-//             <div className="group hidden sm:flex flex-row relative justify-center items-center">
-//               <div className="w-12 h-12 hidden sm:flex justify-center border border-[#1A1B1C] rotate-45 scale-[0.85] group-hover:scale-[0.92] ease duration-300"></div>
-//               <span className="absolute left-[15px] bottom-[13px] scale-[0.9] rotate-180 hidden sm:block group-hover:scale-[0.92] ease duration-300">▶</span>
-//               <span className="text-sm font-semibold hidden sm:block ml-6 ">BACK</span>
-//             </div>
-//           </div>
-//         </Link>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default TestingPage;
+{/* <div className="absolute bottom-38.5 md:bottom-8 w-full flex justify-between md:px-9 px-13">
+        {submissionSuccess && (
+          <Link href="/" className="inset-0" aria-label="Back">
+            <div className="flex items-center">
+              <div className="relative w-12 h-12 flex items-center justify-center border border-[#1A1B1C] rotate-45 scale-[1] sm:hidden">
+                <span className="rotate-[-45deg] text-xs font-semibold">BACK</span>
+              </div>
+              <div className="group hidden sm:flex flex-row relative justify-center items-center">
+                <div className="w-12 h-12 hidden sm:flex justify-center border border-[#1A1B1C] rotate-45 scale-[0.85] group-hover:scale-[0.92] ease-in-out duration-300"></div>
+                <span className="absolute left-[15px] bottom-[13px] scale-[0.9] rotate-180 hidden sm:block group-hover:scale-[0.92] ease-in-out duration-300">▶</span>
+                <span className="text-sm font-semibold hidden sm:block ml-6">BACK</span>
+              </div>
+            </div>
+          </Link>
+        )}
+        {!isSubmitting && submissionSuccess && (
+          <button
+            onClick={handleProceed}
+            className="group inset-0 aria-label='Proceed'"
+          >
+            <div className="relative w-12 h-12 flex items-center justify-center border border-[#1A1B1C] rotate-45 scale-[1] sm:hidden">
+              <span className="rotate-[-45deg] text-xs font-semibold">PROCEED</span>
+            </div>
+            <div className="group hidden sm:flex flex-row relative justify-center items-center">
+              <span className="text-sm font-semibold hidden sm:block mr-6">PROCEED</span>
+              <div className="w-12 h-12 hidden sm:flex justify-center border border-[#1A1B1C] rotate-45 scale-[0.85] group-hover:scale-[0.92] ease-in-out duration-300"></div>
+              <span className="absolute right-[15px] bottom-[13px] scale-[0.9] rotate-0 hidden sm:block group-hover:scale-[0.92] ease-in-out duration-300">▶</span>
+              
+            </div>
+          </button>
+        )}
+      </div> */}
