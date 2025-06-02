@@ -18,7 +18,9 @@ const Header: React.FC<HeaderProps> = ({ section }) => {
   } else if (pathname === '/testing') {
     setCurrentSection('INTRO');
   } else if (pathname === '/analysis') {
-    setCurrentSection('ANALYSIS');
+    setCurrentSection('ANALYSIS'); 
+   } else if (pathname === '/result') {
+    setCurrentSection('INTRO');
   }
   
   else if (section) {
