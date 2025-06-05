@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
@@ -206,9 +207,36 @@ const TestingPage = () => {
               <p className="text-lg text-gray-500">Proceed to the next step</p>
             </div>
           )}
-          <div className="absolute top-1/2 left-1/2 -translate-x-[50%] -translate-y-1/2 w-[400px] h-[400px] md:w-[600px] md:h-[600px] border-2 border-dotted border-[#A0A4AB] opacity-50 animate-spin-slow rotate-185"></div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-[50%] -translate-y-1/2 w-[350px] h-[350px] md:w-[550px] md:h-[550px] border-2 border-dotted border-[#A0A4AB] opacity-30 animate-spin-slower rotate-175"></div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-[50%] -translate-y-1/2 w-[300px] h-[300px] md:w-[500px] md:h-[500px] border-2 border-dotted border-[#A0A4AB] opacity-60 rotate-160 animate-spin-slowest"></div>
+           <Image
+                      alt="Diamond Large"
+                      loading="lazy"
+                      width="482"
+                      height="482"
+                      decoding="async"
+                      className="absolute w-[400px] h-[400px] md:w-[650px] md:h-[650px] animate-spin-slow rotate-200"
+                      src="/DiamondLarge.svg"
+                      style={{ color: "transparent" }}
+                    />
+                    <Image
+                      alt="DiamondMedium"
+                      loading="lazy"
+                      width="444"
+                      height="444"
+                      decoding="async"
+                      className="absolute w-[350px] h-[350px] md:w-[600px] md:h-[600px] animate-spin-slower rotate-190"
+                      src="/DiamondMedium.svg"
+                      style={{ color: "transparent" }}
+                    />
+                    <Image
+                      alt="DiamondSmall"
+                      loading="lazy"
+                      width="405"
+                      height="405"
+                      decoding="async"
+                      className="absolute w-[300px] h-[300px] md:w-[550px] md:h-[550px] animate-spin-slowest"
+                      src="/DiamondSmall.svg"
+                      style={{ color: "transparent" }}
+                    />
         </div>
         <div className="absolute bottom-38.5 md:bottom-8 w-full flex justify-between md:px-9 px-13">
           <Link href="/" className="inset-0" aria-label="Back">

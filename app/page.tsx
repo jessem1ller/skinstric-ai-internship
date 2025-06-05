@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
@@ -23,17 +23,30 @@ const HomePage = () => {
     fontSize: "110px",
     lineHeight: "110px",
     letterSpacing: "-0.07em",
-    textAlign: isHoveringLeft ? 'right' : isHoveringRight ? 'left' : 'center',
+    textAlign: 'center',
     width: "680px",
     height: "240px",
     opacity: fadeIn ? 1 : 0,
-    transition: "text-align .6s ease-in-out, opacity 0.6s ease-in-out, transform .6s ease-in-out",
+    transition: "opacity 0.6s ease-in-out, transform .6s ease-in-out", 
     transform: isHoveringLeft
       ? "translateX(250px)"
       : isHoveringRight
       ? "translateX(-250px)"
       : "translateX(0)",
   };
+
+  const skincareShiftAmount = 100;
+
+  const skincareSpanStyle = {
+    display: 'block',
+    transition: "transform .6s ease-in-out",
+    transform: isHoveringLeft
+      ? `translateX(${skincareShiftAmount}px)`
+      : isHoveringRight
+      ? `translateX(-${skincareShiftAmount}px)`
+      : "translateX(0)",
+  };
+
   return (
     <div className="max-md:scale-[0.85] max-sm:scale-[0.65] max-sm:origin-center max-sm:p-6">
       <div className="flex flex-col items-center justify-center h-[71dvh] md:fixed md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2">
@@ -47,7 +60,11 @@ const HomePage = () => {
             >
               Sophisticated
               <br />
-              <span className="block text-[#1A1B1C]">skincare</span>
+              <span 
+                className="block text-[#1A1B1C]"
+              >
+                skincare
+              </span>
             </h1>
           </div>
         </div>
@@ -58,7 +75,12 @@ const HomePage = () => {
           >
             Sophisticated
             <br />
-            <span className="block text-[#1A1B1C]">skincare</span>
+            <span 
+              className="block text-[#1A1B1C]" 
+              style={skincareSpanStyle as React.CSSProperties}
+            >
+              skincare
+            </span>
           </h1>
         </div>
         <p className="z-10 block lg:hidden w-[30ch] mt-4 text-[16px] font-semibold text-center text-muted-foreground text-[#1a1b1c83]">
