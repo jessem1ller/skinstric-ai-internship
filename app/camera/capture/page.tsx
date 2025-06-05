@@ -4,6 +4,7 @@ import React, { useRef, useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import Image from "next/image";
 
 export default function CameraCapturePage() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -55,9 +56,7 @@ export default function CameraCapturePage() {
         videoRef.current.srcObject = mediaStream;
         await videoRef.current.play().catch((e) => {
           console.warn("Video play was prevented:", e);
-          setError(
-            ""
-          );
+          setError("");
         });
       }
     } catch (err) {
@@ -170,7 +169,7 @@ export default function CameraCapturePage() {
         const analysisDataString = encodeURIComponent(
           JSON.stringify(response.data)
         );
-        router.push(`/summary?data=${analysisDataString}`);
+        router.push(`/select?data=${analysisDataString}`);
       } catch (err) {
         console.error("Error uploading image:", err);
         let message = "An unknown error occurred during upload.";
@@ -266,10 +265,12 @@ export default function CameraCapturePage() {
               className="transform hover:scale-105 active:scale-100 ease-in-out duration-200 group disabled:opacity-50 disabled:transform-none disabled:cursor-not-allowed"
               aria-label="Take Picture"
             >
-              <img
+              <Image
                 src="/TakePicture.svg"
                 alt="Take Picture"
-                className="w-16 h-16"
+                width={64}
+                height={64}
+                priority
               />
             </button>
           </div>
@@ -288,10 +289,21 @@ export default function CameraCapturePage() {
 
         {showConfirmScreen && capturedImageDataUrl && (
           <div className="absolute inset-0 z-40 flex flex-col items-center justify-center bg-gray-900">
-            <img
+            <Image
               src={capturedImageDataUrl}
               alt="Captured preview"
-              className="absolute inset-0 w-full h-full object-cover"
+              layout="fill"
+              objectFit="cover"
+              className="absolute inset-0"
+              style={{
+                transform:
+                  stream &&
+                  stream.getVideoTracks().length > 0 &&
+                  stream.getVideoTracks()[0]?.getSettings().facingMode ===
+                    "user"
+                    ? "scaleX(-1)"
+                    : "scaleX(1)",
+              }}
             />
 
             <div className="relative z-10 flex flex-col items-center justify-between h-full w-full p-8">

@@ -12,17 +12,15 @@ export const metadata: Metadata = {
 
 interface RootLayoutProps {
   children: React.ReactNode;
-  section?: string;
 }
 
-export default function RootLayout({ children, section }: RootLayoutProps) {
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        <ClientHeader section={section} />
+        <ClientHeader />
         <main>{children}</main>
       </body>
     </html>
   );
 }
-

@@ -1,15 +1,15 @@
 "use client";
 
-import React, { useEffect } from 'react';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import React, { useEffect } from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 const CameraLoadingPage = () => {
   const router = useRouter();
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      router.push('/camera/capture');
+      router.push("/camera/capture");
     }, 3000);
 
     return () => clearTimeout(timer);
@@ -23,22 +23,22 @@ const CameraLoadingPage = () => {
           <Image
             alt="Diamond Large"
             loading="lazy"
-            width={482} 
+            width={482}
             height={482}
             decoding="async"
             src="/DiamondLarge.svg"
             className="absolute w-[270px] h-[270px] md:w-[482px] md:h-[482px] animate-spin-slow"
-            style={{ color: 'transparent' }}
+            style={{ color: "transparent" }}
           />
           <Image
             alt="Diamond Medium"
             loading="lazy"
-            width={444} 
+            width={444}
             height={444}
             decoding="async"
             src="/DiamondMedium.svg"
             className="absolute w-[230px] h-[230px] md:w-[444.34px] md:h-[444.34px] animate-spin-slower"
-            style={{ color: 'transparent' }}
+            style={{ color: "transparent" }}
           />
           <Image
             alt="Diamond Small"
@@ -48,7 +48,7 @@ const CameraLoadingPage = () => {
             decoding="async"
             src="/DiamondSmall.svg"
             className="absolute w-[190px] h-[190px] md:w-[405.18px] md:h-[405.18px] animate-spin-slowest"
-            style={{ color: 'transparent' }}
+            style={{ color: "transparent" }}
           />
           <div className="absolute inset-0 flex flex-col items-center justify-center animate-pulse">
             <Image
@@ -59,7 +59,7 @@ const CameraLoadingPage = () => {
               decoding="async"
               src="/camera.svg"
               className="w-[100px] h-[100px] md:w-[136px] md:h-[136px] animate-pulse-grow"
-              style={{ color: 'transparent' }}
+              style={{ color: "transparent" }}
             />
             <p className="absolute font-semibold text-sm md:text-base leading-[24px] tracking-tight translate-y-22 animate-pulse">
               SETTING UP CAMERA ...
