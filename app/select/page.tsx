@@ -58,7 +58,10 @@ const DiamondButton: React.FC<DiamondButtonProps> = ({
         buttonElement
       ) : href && !disabled ? (
         <Link href={href} passHref>
-          {React.cloneElement(buttonElement, { onClick: undefined } as any)}
+          {React.cloneElement(
+            buttonElement,
+            { onClick: undefined } as React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>
+          )}
         </Link>
       ) : (
         buttonElement
