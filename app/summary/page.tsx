@@ -450,7 +450,7 @@ export default function SummaryPage() {
             </div>
             <div className="hidden sm:flex items-center">
               <div className="relative w-12 h-12 flex justify-center items-center border border-[#1A1B1C] rotate-45 scale-[0.85] group-hover:scale-[0.92] ease duration-300">
-                <span className="absolute left-[15px] top-1/2 -translate-y-1/2 transform scale-[0.9] rotate-180 text-[#1A1B1C] group-hover:scale-[0.92] ease duration-300 origin-center pointer-events-none">
+                <span className="absolute left-[15px] top-1/2 -translate-y-1/2 transform scale-[0.9] rotate-140 text-[#1A1B1C] group-hover:scale-[0.92] ease duration-300 origin-center pointer-events-none">
                   ▶
                 </span>
               </div>
