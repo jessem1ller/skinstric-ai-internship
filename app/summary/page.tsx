@@ -437,7 +437,7 @@ export default function SummaryPage() {
         </Suspense>
       </main>
 
-      <footer className="pt-4 md:pt-[3px] bg-white sticky bottom-40 md:static md:bottom-0 mb-8 md:mb-16">
+      <footer className="pt-4 md:pt-[3px] bottom-40 md:static md:bottom-0 mb-8 md:mb-16">
         <div className="flex justify-between items-center max-w-full mx-auto py-6 px-4 md:px-8">
           <Link
             href="/select"
